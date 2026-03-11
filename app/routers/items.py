@@ -85,7 +85,7 @@ def update_item_route(
 
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_item_route(item_id: uuid.UUID, db: Session = Depends(get_db)) -> None:
+def delete_item_route(item_id: uuid.UUID, db: Session = Depends(get_db), current_user = Depends(get_current_user)) -> None:
     try:
         item = get_item(db, item_id)
     except ServiceDatabaseError as exc:

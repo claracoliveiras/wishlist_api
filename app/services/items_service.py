@@ -36,7 +36,7 @@ def list_items(
     db: Session, skip: int = 0, limit: int = 100, owner_id: str | None = None
 ) -> list[Items]:
     try:
-        query = select(Items)
+        query = select(Items).order_by(Items.created_at.desc())
         if owner_id:
             query = query.where(Items.owner_id == owner_id)
         return list(db.scalars(query.offset(skip).limit(limit)).all())
