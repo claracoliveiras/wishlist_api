@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_password_hash
 from app.db.db import get_db
 from app.models.users import Users
 from app.schemas.users import UserCreate, UserRead, UserUpdate
@@ -11,6 +12,7 @@ from app.services.users_service import (
     create_user,
     delete_user,
     get_user,
+    get_user_by_username,
     list_users,
     update_user,
 )
@@ -20,7 +22,9 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 def create_user_route(payload: UserCreate, db: Session = Depends(get_db)) -> UserRead:
-    user = Users(**payload.model_dump())
+    user_data = payload.model_dump()
+    user_data["password"] = get_password_hash(payload.password)
+    user = Users(**user_data)
     try:
         return create_user(db, user)
     except ServiceConflictError as exc:
@@ -39,6 +43,19 @@ def list_users_route(
         return list_users(db, skip=skip, limit=limit)
     except ServiceDatabaseError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+@router.get("/by-username/{username}", response_model=UserRead)
+def get_user_by_username_route(username: str, db: Session = Depends(get_db)) -> UserRead:
+    try:
+        user = get_user_by_username(db, username)
+    except ServiceDatabaseError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return user
 
 
 @router.get("/{user_id}", response_model=UserRead)
@@ -67,7 +84,11 @@ def update_user_route(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    for key, value in payload.model_dump(exclude_unset=True).items():
+    update_data = payload.model_dump(exclude_unset=True)
+    if "password" in update_data and update_data["password"] is not None:
+        update_data["password"] = get_password_hash(update_data["password"])
+
+    for key, value in update_data.items():
         setattr(user, key, value)
 
     try:

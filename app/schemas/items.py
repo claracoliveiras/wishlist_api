@@ -6,13 +6,13 @@ from pydantic import BaseModel, ConfigDict
 
 
 class ItemBase(BaseModel):
-    owner_id: str | None = None
+    owner_id: uuid.UUID | None = None
     item_url: str | None = None
     item_img: str | None = None
 
 
 class ItemCreate(ItemBase):
-    owner_id: str
+    owner_id: uuid.UUID
     item_url: str
     item_img: str
 
@@ -23,7 +23,7 @@ class ItemUpdate(ItemBase):
 
 class ItemRead(ItemBase):
     id: uuid.UUID
-    owner_id: str
+    owner_id: uuid.UUID
     item_url: str
     item_img: str
 

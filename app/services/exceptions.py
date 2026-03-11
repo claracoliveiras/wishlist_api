@@ -8,3 +8,6 @@ class ServiceDatabaseError(ServiceError):
 
 class ServiceConflictError(ServiceError):
     """Raised when a write conflicts with DB constraints."""
+
+class CredentialsError(ServiceError):
+    """Raised when a credential isn't validated."""

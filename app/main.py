@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.routers.auth import router as auth_router
 from app.routers.collection_items import router as collection_items_router
 from app.routers.collections import router as collections_router
 from app.routers.following import router as following_router
@@ -8,6 +9,7 @@ from app.routers.users import router as users_router
 
 app = FastAPI()
 
+app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(items_router)
 app.include_router(collections_router)

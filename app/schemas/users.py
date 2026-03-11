@@ -1,6 +1,7 @@
 from __future__ import annotations
+import uuid
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
@@ -11,18 +12,21 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    id: str
+    id: uuid.UUID
     username: str
     email: str
+    password: str = Field(min_length=8)
 
 
 class UserUpdate(UserBase):
-    pass
+    password: str | None = Field(default=None, min_length=8)
 
 
 class UserRead(UserBase):
-    id: str
+    id: uuid.UUID
     username: str
     email: str
+    profile_picture: str
+    banner_picture: str
 
     model_config = ConfigDict(from_attributes=True)

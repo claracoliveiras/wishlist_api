@@ -35,6 +35,12 @@ from app.services.following_service import (
     list_followings,
     update_following,
 )
+from app.services.exceptions import (
+    CredentialsError,
+    ServiceConflictError,
+    ServiceDatabaseError,
+    ServiceError,
+)
 
 __all__ = [
     "create_user",
@@ -67,4 +73,5 @@ __all__ = [
     "ServiceError",
     "ServiceDatabaseError",
     "ServiceConflictError",
+    "CredentialsError",
 ]
