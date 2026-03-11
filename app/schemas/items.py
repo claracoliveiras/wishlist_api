@@ -12,7 +12,6 @@ class ItemBase(BaseModel):
 
 
 class ItemCreate(ItemBase):
-    owner_id: uuid.UUID
     item_url: str
     item_img: str
 

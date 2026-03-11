@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.db.db import get_db
 from app.models.items import Items
 from app.schemas.items import ItemCreate, ItemRead, ItemUpdate
+from app.services.auth_service import get_current_user
 from app.services.exceptions import ServiceConflictError, ServiceDatabaseError
 from app.services.items_service import (
     create_item,
@@ -21,8 +22,10 @@ router = APIRouter(prefix="/items", tags=["items"])
 
 
 @router.post("", response_model=ItemRead, status_code=status.HTTP_201_CREATED)
-def create_item_route(payload: ItemCreate, db: Session = Depends(get_db)) -> ItemRead:
-    item = Items(**payload.model_dump())
+def create_item_route(payload: ItemCreate, db: Session = Depends(get_db), current_user = Depends(get_current_user)) -> ItemRead:
+    data = payload.model_dump()
+    data["owner_id"] = current_user.id
+    item = Items(**data)
     try:
         return create_item(db, item)
     except ServiceConflictError as exc:
